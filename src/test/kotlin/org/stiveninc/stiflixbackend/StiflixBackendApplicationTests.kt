@@ -1,4 +1,4 @@
-package org.stiflix.stiflixbackend
+package org.stiveninc.stiflixbackend
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

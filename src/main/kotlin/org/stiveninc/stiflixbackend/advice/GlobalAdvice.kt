@@ -1,4 +1,4 @@
-package org.stiflix.stiflixbackend.advice
+package org.stiveninc.stiflixbackend.advice
 
 import org.springframework.web.bind.annotation.ControllerAdvice
 
