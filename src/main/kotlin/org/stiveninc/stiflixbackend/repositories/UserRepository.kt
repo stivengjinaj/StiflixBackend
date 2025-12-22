@@ -28,6 +28,11 @@ class UserRepository(
         return documentSnapshot.toObject(UserDocument::class.java).toDto(documentSnapshot.id)
     }
 
+    fun updateUserVerification(userId: String) {
+        val userRef = userCollection.document(userId)
+        userRef.update("verified", true)
+    }
+
     fun save(userDocument: UserDocument) {
         userCollection.document().set(userDocument)
     }

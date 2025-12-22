@@ -19,6 +19,10 @@ class UserServiceImpl(
         return userRepository.findByEmail(email)
     }
 
+    override fun updateUserVerification(userId: String) {
+        return userRepository.updateUserVerification(userId)
+    }
+
     override fun save(user: UserDocument) {
         userRepository.save(user)
     }
