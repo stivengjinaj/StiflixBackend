@@ -3,3 +3,10 @@ spring:
     name: StiflixBackend
   config:
     import: optional:file:.env[.properties]
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=30m
+logging:
+  level:
+    org.springframework.web: DEBUG

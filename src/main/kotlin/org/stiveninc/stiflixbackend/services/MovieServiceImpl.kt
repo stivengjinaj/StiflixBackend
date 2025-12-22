@@ -15,7 +15,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.stiveninc.stiflixbackend.dtos.TmdbGenresResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbImagesResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
@@ -31,8 +31,6 @@ class MovieServiceImpl(
         ?: error("TMDB_READ_TOKEN must be set")
 ): MovieService {
 
-    private val logger = LoggerFactory.getLogger(MovieServiceImpl::class.java)
-
     private val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
@@ -42,6 +40,7 @@ class MovieServiceImpl(
         }
     }
 
+    @Cacheable(value = ["tmdb_movies"], key = "'popular_movies'")
     override suspend fun getPopularMovies(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/discover/movie") {
@@ -61,7 +60,7 @@ class MovieServiceImpl(
             body.results
         }
 
-
+    @Cacheable(value = ["tmdb_tvshows"], key = "'popular_tvshows'")
     override suspend fun getPopularTvShows(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/discover/tv") {
@@ -85,6 +84,7 @@ class MovieServiceImpl(
             body.results
         }
 
+    @Cacheable(value = ["tmdb_movies"], key = "'top_rated_movies'")
     override suspend fun getTopRatedMovies(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/movie/top_rated") {
@@ -108,6 +108,7 @@ class MovieServiceImpl(
             body.results
         }
 
+    @Cacheable(value = ["tmdb_tvshows"], key = "'top_rated_tvshows'")
     override suspend fun getTopRatedTvShows(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/tv/top_rated") {
@@ -130,10 +131,10 @@ class MovieServiceImpl(
 
             body.results
         }
-
+    @Cacheable(value = ["tmdb_movies"], key = "'trending_movies'")
     override suspend fun getTrendingMovies(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
-            val response = client.get("https://api.themoviedb.org/3/trending/all/day") {
+            val response = client.get("https://api.themoviedb.org/3/trending/all/week") {
                 parameter("language", "en-US")
                 parameter("api_key", tmdbApiKey)
 
@@ -169,6 +170,7 @@ class MovieServiceImpl(
             body
         }
 
+    @Cacheable(value = ["tmdb_movies"], key = "'discover_movies'")
     override suspend fun discoverMovies(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/discover/movie") {
@@ -192,6 +194,7 @@ class MovieServiceImpl(
             body.results
         }
 
+    @Cacheable(value = ["tmdb_tvshows"], key = "'discover_tvshows'")
     override suspend fun discoverTvShows(): List<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/discover/tv") {

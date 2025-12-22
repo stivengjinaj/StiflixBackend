@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.bucket4j:bucket4j_jdk17-core:8.15.0")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
