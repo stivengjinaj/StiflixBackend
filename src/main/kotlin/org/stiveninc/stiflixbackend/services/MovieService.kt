@@ -4,17 +4,17 @@ import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
 
 interface MovieService {
     suspend fun getPopularMovies(): List<TmdbMovieDto>
-    fun getPopularTvShows(): List<TmdbMovieDto>
-    fun getTopRatedMovies(): List<TmdbMovieDto>
-    fun getTopRatedTvShows(): List<TmdbMovieDto>
-    fun getTrendingMovies(): List<TmdbMovieDto>
-    fun getTvShowDetails(tvShowId: Int): TmdbMovieDto
-    fun discoverMovies(): List<TmdbMovieDto>
-    fun discoverTvShows(): List<TmdbMovieDto>
-    fun search(query: String): Pair<List<TmdbMovieDto>, List<TmdbMovieDto>>
-    fun getTrailerKey(mediaType: String, mediaId: Int): String?
-    fun mediaGenres(mediaType: String): Map<Int, String>
-    fun mediaDetails(mediaType: String, mediaId: Int): Any
-    fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): Any
-    fun getLogos(): List<String>
+    suspend fun getPopularTvShows(): List<TmdbMovieDto>
+    suspend fun getTopRatedMovies(): List<TmdbMovieDto>
+    suspend fun getTopRatedTvShows(): List<TmdbMovieDto>
+    suspend fun getTrendingMovies(): List<TmdbMovieDto>
+    suspend fun getTvShowDetails(tvShowId: Int): TmdbMovieDto
+    suspend fun discoverMovies(): List<TmdbMovieDto>
+    suspend fun discoverTvShows(): List<TmdbMovieDto>
+    suspend fun search(query: String): Pair<List<TmdbMovieDto>, List<TmdbMovieDto>>
+    suspend fun getTrailerKey(mediaType: String, mediaId: Int): List<String>
+    suspend fun mediaGenres(mediaType: String): Map<Int, String>
+    suspend fun mediaDetails(mediaType: String, mediaId: Int): Any
+    suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): Any
+    suspend fun getLogos(mediaType: String, mediaId: Int): List<String>
 }

@@ -28,5 +28,6 @@ data class TmdbMovieDto(
     val numberOfSeasons: Int? = null,
     @SerialName("number_of_episodes")
     val numberOfEpisodes: Int? = null,
-    val seasons: List<TmdbSeasonDto>? = null
+    val seasons: List<TmdbSeasonDto>? = null,
+    val genres: List<TmdbGenreDto>? = null
 )
