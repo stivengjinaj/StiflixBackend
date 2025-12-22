@@ -23,8 +23,13 @@ class UserServiceImpl(
         return userRepository.updateUserVerification(userId)
     }
 
-    override fun save(user: UserDocument) {
-        userRepository.save(user)
+    override fun save(id: String, user: UserDocument) {
+        val cleanUser = user.copy(
+            fullName = user.fullName?.trim(),
+            email = user.email?.trim(),
+            avatar = user.avatar?.trim()
+        )
+        userRepository.save(id, cleanUser)
     }
     override fun getContinueWatching(userId: String): List<MovieDto> {
         return userRepository.getContinueWatching(userId)

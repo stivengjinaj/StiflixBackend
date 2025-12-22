@@ -33,8 +33,14 @@ class UserRepository(
         userRef.update("verified", true)
     }
 
-    fun save(userDocument: UserDocument) {
-        userCollection.document().set(userDocument)
+    fun save(id: String, userDocument: UserDocument) {
+        val cleanUser = userDocument.copy(
+            fullName = userDocument.fullName,
+            email = userDocument.email,
+            avatar = userDocument.avatar,
+            verified = false
+        )
+        userCollection.document(id).set(cleanUser)
     }
 
     fun getContinueWatching(userId: String): List<MovieDto> {

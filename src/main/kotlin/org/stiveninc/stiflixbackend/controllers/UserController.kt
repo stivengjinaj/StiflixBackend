@@ -7,7 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -39,9 +38,10 @@ class UserController(private val userService: UserService) {
     @PostMapping("/api/v2/users/")
     @ResponseStatus(HttpStatus.CREATED)
     fun saveUser(
+        @AuthenticationPrincipal userId: String,
         @Valid @RequestBody user: UserDocument
     ) {
-        return userService.save(user)
+        return userService.save(userId, user)
     }
 
     @PreAuthorize("isAuthenticated()")
