@@ -1,10 +1,12 @@
 package org.stiveninc.stiflixbackend.services
 
 import org.springframework.stereotype.Service
+import org.stiveninc.stiflixbackend.config.setUserRole
 import org.stiveninc.stiflixbackend.dtos.MovieDto
 import org.stiveninc.stiflixbackend.dtos.UserDto
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 import org.stiveninc.stiflixbackend.entities.UserDocument
+import org.stiveninc.stiflixbackend.enums.UserRole
 import org.stiveninc.stiflixbackend.repositories.UserRepository
 
 @Service
@@ -29,6 +31,7 @@ class UserServiceImpl(
             email = user.email?.trim(),
             avatar = user.avatar?.trim()
         )
+        setUserRole(id, UserRole.VIEWER)
         userRepository.save(id, cleanUser)
     }
     override fun getContinueWatching(userId: String): List<MovieDto> {

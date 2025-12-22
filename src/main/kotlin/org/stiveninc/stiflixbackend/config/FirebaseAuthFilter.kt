@@ -8,6 +8,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.stiveninc.stiflixbackend.enums.UserRole
 
 class FirebaseAuthFilter : OncePerRequestFilter() {
 
@@ -39,7 +40,7 @@ class FirebaseAuthFilter : OncePerRequestFilter() {
 
                 SecurityContextHolder.getContext().authentication = authentication
 
-            } catch (ex: Exception) {
+            } catch (_: Exception) {
                 response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Invalid or expired Firebase token"
@@ -50,4 +51,11 @@ class FirebaseAuthFilter : OncePerRequestFilter() {
 
         filterChain.doFilter(request, response)
     }
+}
+
+fun setUserRole(uid: String, role: UserRole) {
+    FirebaseAuth.getInstance().setCustomUserClaims(
+        uid,
+        mapOf("role" to role.name)
+    )
 }

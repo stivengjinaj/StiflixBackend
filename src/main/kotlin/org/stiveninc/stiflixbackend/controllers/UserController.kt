@@ -6,18 +6,32 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.stiveninc.stiflixbackend.config.setUserRole
 import org.stiveninc.stiflixbackend.dtos.MovieDto
 import org.stiveninc.stiflixbackend.dtos.UserDto
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 import org.stiveninc.stiflixbackend.entities.UserDocument
+import org.stiveninc.stiflixbackend.enums.UserRole
 import org.stiveninc.stiflixbackend.services.UserService
 
 @RestController
 class UserController(private val userService: UserService) {
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PutMapping("/api/v2/admin/{userId}/role")
+    fun setRole(
+        @PathVariable userId: String,
+        @RequestParam role: UserRole
+    ) {
+        setUserRole(userId, role)
+    }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/api/v2/users/me")
