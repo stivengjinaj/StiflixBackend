@@ -15,6 +15,6 @@ class GlobalAdvice {
 
     @ExceptionHandler(PopularMoviesException::class)
     fun handlePopularMoviesException(msg: String = "Could not fetch popular movies"): ResponseEntity<String> {
-        return ResponseEntity.status(500).body(msg)
+        return ResponseEntity.status(404).body(msg)
     }
 }
