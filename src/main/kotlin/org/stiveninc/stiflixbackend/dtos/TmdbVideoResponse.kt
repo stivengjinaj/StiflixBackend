@@ -48,8 +48,3 @@ data class TmdbLogoDto(
     @SerialName("iso_639_1")
     val language: String? = null
 )
-
-@Serializable
-data class TmdbImagesResponse(
-    val logos: List<TmdbLogoDto> = emptyList()
-)

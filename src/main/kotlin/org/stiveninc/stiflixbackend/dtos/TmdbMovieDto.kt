@@ -8,8 +8,12 @@ import kotlinx.serialization.SerialName
 data class TmdbMovieDto(
     val id: Int,
     val title: String? = null,
+    @SerialName("original_title")
+    val originalTitle: String? = null,
     val name: String? = null,
     val overview: String? = null,
+    @SerialName("original_name")
+    val originalName: String? = null,
     @SerialName("backdrop_path")
     val backdropPath: String? = null,
     @SerialName("poster_path")
@@ -22,8 +26,8 @@ data class TmdbMovieDto(
     val firstAirDate: String? = null,
     @SerialName("vote_average")
     val voteAverage: Double? = null,
-    @SerialName("isSeries")
-    val isSeries: Boolean = false,
+    @SerialName("media_type")
+    val mediaType: String? = null,
     @SerialName("number_of_seasons")
     val numberOfSeasons: Int? = null,
     @SerialName("number_of_episodes")

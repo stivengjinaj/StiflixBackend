@@ -1,9 +1,12 @@
 package org.stiveninc.stiflixbackend.controllers
 
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
+import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
 import org.stiveninc.stiflixbackend.services.MovieService
 
 @RestController
@@ -32,7 +35,7 @@ class MoviesController(
     }
 
     @GetMapping("/api/v2/movies/trendingMovies")
-    suspend fun getTrendingMovies(): List<TmdbMovieDto> {
+    suspend fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> {
         return service.getTrendingMovies()
     }
 
@@ -56,7 +59,7 @@ class MoviesController(
     @GetMapping("/api/v2/movies/search/{query}")
     suspend fun search(
         @PathVariable query: String
-    ): Pair<List<TmdbMovieDto>, List<TmdbMovieDto>> {
+    ): TmdbPagedResponse<TmdbMovieDto> {
         return service.search(query)
     }
 
@@ -68,34 +71,41 @@ class MoviesController(
         return service.getTrailerKey(mediaType, mediaId)
     }
 
-    @GetMapping("/api/v2/movies/genres/{mediaType}")
+    @GetMapping("/api/v2/movies/genres/{mediaId}/{mediaType}")
     suspend fun mediaGenres(
+        @PathVariable mediaId: Int,
         @PathVariable mediaType: String
     ): Map<Int, String> {
-        return service.mediaGenres(mediaType)
+        return service.mediaGenres(mediaId, mediaType)
     }
 
     @GetMapping("/api/v2/movies/details/{mediaType}/{mediaId}")
     suspend fun mediaDetails(
         @PathVariable mediaType: String,
         @PathVariable mediaId: Int
-    ): Any {
-        return service.mediaDetails(mediaType, mediaId)
-    }
+    ): ResponseEntity<String> =
+        ResponseEntity
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(service.mediaDetails(mediaType, mediaId))
 
-    @GetMapping("/api/v2/movies/tvShows/{tvShowId}/seasons/{seasonNumber}")
+    @GetMapping("/api/v2/movies/tv/{tvShowId}/seasons/{seasonNumber}")
     suspend fun getTvShowsSeasons(
         @PathVariable tvShowId: Int,
         @PathVariable seasonNumber: Int
-    ): Any {
-        return service.getTvShowsSeasons(tvShowId, seasonNumber)
-    }
+    ): ResponseEntity<String> =
+        ResponseEntity
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(service.getTvShowsSeasons(tvShowId, seasonNumber))
 
     @GetMapping("/api/v2/movies/logos/{mediaType}/{mediaId}")
     suspend fun getLogos(
         @PathVariable mediaType: String,
         @PathVariable mediaId: Int
-    ): List<String> {
-        return service.getLogos(mediaType, mediaId)
-    }
+    ): ResponseEntity<String> =
+        ResponseEntity
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(service.getLogos(mediaType, mediaId))
 }

@@ -9,6 +9,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -17,9 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.springframework.cache.annotation.Cacheable
 import org.stiveninc.stiflixbackend.dtos.TmdbGenresResponse
-import org.stiveninc.stiflixbackend.dtos.TmdbImagesResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
-import org.stiveninc.stiflixbackend.dtos.TmdbSeasonDto
 import org.stiveninc.stiflixbackend.dtos.TmdbVideosResponse
 import org.stiveninc.stiflixbackend.exceptions.PopularMoviesException
 
@@ -132,9 +131,9 @@ class MovieServiceImpl(
             body.results
         }
     @Cacheable(value = ["tmdb_movies"], key = "'trending_movies'")
-    override suspend fun getTrendingMovies(): List<TmdbMovieDto> =
+    override suspend fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
-            val response = client.get("https://api.themoviedb.org/3/trending/all/week") {
+            val response = client.get("https://api.themoviedb.org/3/trending/all/day") {
                 parameter("language", "en-US")
                 parameter("api_key", tmdbApiKey)
 
@@ -148,7 +147,7 @@ class MovieServiceImpl(
 
             val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
 
-            body.results
+            body
         }
 
     override suspend fun getTvShowDetails(tvShowId: Int): TmdbMovieDto =
@@ -219,7 +218,7 @@ class MovieServiceImpl(
             body.results
         }
 
-    override suspend fun search(query: String): Pair<List<TmdbMovieDto>, List<TmdbMovieDto>> =
+    override suspend fun search(query: String): TmdbPagedResponse<TmdbMovieDto> =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/search/multi") {
                 parameter("query", query)
@@ -238,10 +237,7 @@ class MovieServiceImpl(
 
             val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
 
-            val movies = body.results.filter { it.title != null }
-            val tvShows = body.results.filter { it.name != null }
-
-            Pair(movies, tvShows)
+            body
         }
 
     override suspend fun getTrailerKey(
@@ -254,7 +250,7 @@ class MovieServiceImpl(
                 "https://api.themoviedb.org/3/$mediaType/$mediaId/videos"
             ) {
                 parameter("language", "en-US")
-
+                parameter("api_key", tmdbApiKey)
                 header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
                 header(HttpHeaders.Accept, "application/json")
             }
@@ -271,13 +267,14 @@ class MovieServiceImpl(
         }
 
 
-    override suspend fun mediaGenres(mediaType: String): Map<Int, String> =
+    override suspend fun mediaGenres(mediaId: Int, mediaType: String): Map<Int, String> =
         withContext(Dispatchers.IO) {
 
             val response = client.get(
-                "https://api.themoviedb.org/3/genre/$mediaType/list"
+                "https://api.themoviedb.org/3/$mediaType/$mediaId"
             ) {
                 parameter("language", "en-US")
+                parameter("api_key", tmdbApiKey)
 
                 header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
                 header(HttpHeaders.Accept, "application/json")
@@ -296,14 +293,14 @@ class MovieServiceImpl(
     override suspend fun mediaDetails(
         mediaType: String,
         mediaId: Int
-    ): TmdbMovieDto =
+    ): String =
         withContext(Dispatchers.IO) {
 
             val response = client.get(
                 "https://api.themoviedb.org/3/$mediaType/$mediaId"
             ) {
                 parameter("language", "en-US")
-
+                parameter("api_key", tmdbApiKey)
                 header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
                 header(HttpHeaders.Accept, "application/json")
             }
@@ -312,11 +309,11 @@ class MovieServiceImpl(
                 throw PopularMoviesException("TMDB error: ${response.status}")
             }
 
-            response.body()
+            response.bodyAsText()
         }
 
 
-    override suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): List<TmdbSeasonDto> =
+    override suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String =
         withContext(Dispatchers.IO) {
             val response = client.get("https://api.themoviedb.org/3/tv/$tvShowId/season/$seasonNumber") {
                 parameter("language", "en-US")
@@ -330,20 +327,22 @@ class MovieServiceImpl(
                 throw PopularMoviesException("Failed: ${response.status}")
             }
 
-            val body: List<TmdbSeasonDto> = response.body()
-
-            body
+            response.bodyAsText()
         }
 
     override suspend fun getLogos(
         mediaType: String,
         mediaId: Int
-    ): List<String> =
+    ): String =
         withContext(Dispatchers.IO) {
 
             val response = client.get(
-                "https://api.themoviedb.org/3/$mediaType/$mediaId/images"
+                "https://api.themoviedb.org/3/$mediaType/$mediaId"
             ) {
+                parameter("language", "en-US")
+                parameter("append_to_response", "images")
+                parameter("include_image_language", "en")
+
                 header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
                 header(HttpHeaders.Accept, "application/json")
             }
@@ -352,11 +351,6 @@ class MovieServiceImpl(
                 throw PopularMoviesException("TMDB error: ${response.status}")
             }
 
-            val body: TmdbImagesResponse = response.body()
-
-            body.logos
-                .filter { it.filePath.isNotBlank() }
-                .map { "https://image.tmdb.org/t/p/original${it.filePath}" }
+            response.bodyAsText()
         }
-
 }
