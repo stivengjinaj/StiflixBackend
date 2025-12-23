@@ -10,7 +10,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
-@Component
 class IpRateLimitFilter : OncePerRequestFilter() {
     private val buckets = ConcurrentHashMap<String, Bucket>()
 

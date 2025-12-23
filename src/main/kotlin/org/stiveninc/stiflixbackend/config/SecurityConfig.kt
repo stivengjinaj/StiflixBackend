@@ -2,6 +2,7 @@ package org.stiveninc.stiflixbackend.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -18,7 +19,7 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
-            .cors {  }
+            .cors(Customizer.withDefaults())
             .csrf { it.disable() }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -34,17 +35,4 @@ class SecurityConfig {
             )
             .build()
     }
-
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val config = CorsConfiguration()
-        config.allowedOrigins = listOf("https://stiflix.onrender.com", "http://localhost:5173")
-        config.allowedMethods = listOf("GET","POST","PATCH","PUT","DELETE")
-        config.allowedHeaders = listOf("*")
-
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", config)
-        return source
-    }
-
 }

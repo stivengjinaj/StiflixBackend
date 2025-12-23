@@ -7,3 +7,7 @@ spring:
     type: caffeine
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=1d
+logging:
+    level:
+        root: INFO
+        com.stiflix: DEBUG
