@@ -18,4 +18,5 @@ interface MovieService {
     fun mediaDetails(mediaType: String, mediaId: Int): String
     fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String
     fun getLogos(mediaType: String, mediaId: Int): String
+    fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
 }

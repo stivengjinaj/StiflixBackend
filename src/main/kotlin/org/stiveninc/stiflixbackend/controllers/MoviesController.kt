@@ -2,6 +2,7 @@ package org.stiveninc.stiflixbackend.controllers
 
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -108,4 +109,20 @@ class MoviesController(
             .ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(service.getLogos(mediaType, mediaId))
+
+    @PreAuthorize("hasRole('OWNER') or hasRole('EDITOR')")
+    @GetMapping("/api/v2/stiflixchill/home/{page}")
+    suspend fun getStiflixChillHome(
+        @PathVariable page: Int = 1
+    ): TmdbPagedResponse<TmdbMovieDto> {
+        return service.getStiflixChillHome(page)
+    }
+
+    @PreAuthorize("isAuthenticated() or hasRole('OWNER') or hasRole('EDITOR')")
+    @GetMapping("/api/v2/stiflixchill/communication")
+    suspend fun getStiflixChillCommunication(): ResponseEntity<String> =
+        ResponseEntity
+            .ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("Communication")
 }

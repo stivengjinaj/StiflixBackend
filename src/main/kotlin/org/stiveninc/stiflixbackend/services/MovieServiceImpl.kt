@@ -297,4 +297,27 @@ class MovieServiceImpl(
 
         response.bodyAsText()
     }
+
+    @Cacheable(value = ["tmdb_movies"], key = "'stiflix_chill_home'")
+    override fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto> {
+        return runBlocking {
+            val response = client.get("https://api.themoviedb.org/3/discover/movie") {
+                parameter("include_adult", true)
+                parameter("include_video", false)
+                parameter("language" , "en-US")
+                parameter("page", page)
+                parameter("sort_by", "popularity.desc")
+                header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
+                header(HttpHeaders.Accept, "application/json")
+            }
+
+            if (!response.status.isSuccess()) {
+                throw PopularMoviesException("TMDB error: ${response.status}")
+            }
+
+            val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
+
+            body
+        }
+    }
 }
