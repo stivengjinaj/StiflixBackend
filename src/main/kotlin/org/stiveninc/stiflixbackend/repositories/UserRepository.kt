@@ -1,5 +1,6 @@
 package org.stiveninc.stiflixbackend.repositories
 
+import com.google.cloud.firestore.FieldValue
 import com.google.cloud.firestore.Firestore
 import org.springframework.stereotype.Repository
 import org.stiveninc.stiflixbackend.dtos.MovieDto
@@ -14,7 +15,6 @@ class UserRepository(
     firestore: Firestore
 ) {
     private val userCollection = firestore.collection("users")
-
     fun findById(id: String): UserDto {
         val documentSnapshot = userCollection.document(id).get().get()
         return documentSnapshot.toObject(UserDocument::class.java)?.toDto(id)
@@ -68,7 +68,7 @@ class UserRepository(
     fun getWatchList(userId: String): List<MovieDto> {
         val watchedSnapshot = userCollection
             .document(userId)
-            .collection("watched")
+            .collection("watchList")
             .get()
             .get()
         return watchedSnapshot.documents
@@ -79,7 +79,7 @@ class UserRepository(
     fun getWatchLater(userId: String): List<MovieDto> {
         val toWatchSnapshot = userCollection
             .document(userId)
-            .collection("toWatch")
+            .collection("watchLater")
             .get()
             .get()
         return toWatchSnapshot.documents
@@ -88,39 +88,59 @@ class UserRepository(
     }
 
     fun saveContinueWatching(userId: String, movieDocument: MovieDocument) {
+        val data = mapOf(
+            "movieId" to movieDocument.movieId,
+            "mediaType" to movieDocument.mediaType,
+            "posterPath" to movieDocument.posterPath,
+            "season" to movieDocument.season?.toInt(),
+            "episode" to movieDocument.episode?.toInt(),
+            "date" to FieldValue.serverTimestamp()
+        )
         movieDocument.movieId?.let {
             userCollection
                 .document(userId)
                 .collection("continueWatching")
                 .document(it)
-        }?.set(movieDocument)
+        }?.set(data)
     }
 
     fun saveWatchList(userId: String, movieDocument: MovieDocument) {
+        val data = mapOf(
+            "movieId" to movieDocument.movieId,
+            "mediaType" to movieDocument.mediaType
+        )
         movieDocument.movieId?.let {
             userCollection
                 .document(userId)
                 .collection("watchList")
                 .document(it)
-        }?.set(movieDocument)
+        }?.set(data)
     }
 
     fun saveWatchLater(userId: String, movieDocument: MovieDocument) {
+        val data = mapOf(
+            "movieId" to movieDocument.movieId,
+            "mediaType" to movieDocument.mediaType
+        )
         movieDocument.movieId?.let {
             userCollection
                 .document(userId)
                 .collection("watchLater")
                 .document(it)
-        }?.set(movieDocument)
+        }?.set(data)
     }
 
     fun saveFavourites(userId: String, movieDocument: MovieDocument) {
+        val data = mapOf(
+            "movieId" to movieDocument.movieId,
+            "mediaType" to movieDocument.mediaType
+        )
         movieDocument.movieId?.let {
             userCollection
                 .document(userId)
                 .collection("favourites")
                 .document(it)
-        }?.set(movieDocument)
+        }?.set(data)
     }
 
     fun removeContinueWatching(userId: String, movieId: String) {

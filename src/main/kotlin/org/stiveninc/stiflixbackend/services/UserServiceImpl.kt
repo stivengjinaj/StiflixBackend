@@ -75,11 +75,13 @@ class UserServiceImpl(
         val favourites = userRepository.getFavourites(userId)
         val watchList = userRepository.getWatchList(userId)
         val watchLater = userRepository.getWatchLater(userId)
+        val continueWatching = userRepository.getContinueWatching(userId)
 
         return UserMoviesDto (
             favourites = favourites,
             watchList = watchList,
-            watchLater = watchLater
+            watchLater = watchLater,
+            continueWatching = continueWatching,
         )
     }
 }

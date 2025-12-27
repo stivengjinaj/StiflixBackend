@@ -10,5 +10,7 @@ data class UserMoviesDto(
     @SerialName("watchLater")
     val watchLater: List<MovieDto>? = null,
     @SerialName("watchList")
-    val watchList: List<MovieDto>? = null
+    val watchList: List<MovieDto>? = null,
+    @SerialName("continueWatching")
+    val continueWatching: List<MovieDto>? = null,
 )
