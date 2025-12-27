@@ -25,8 +25,6 @@ import org.stiveninc.stiflixbackend.repositories.Repository
 
 @Service
 class MovieServiceImpl(
-    private val tmdbApiKey: String = System.getenv("TMDB_API_KEY")
-        ?: error("TMDB_API_KEY must be set"),
     private val tmdbReadToken: String = System.getenv("TMDB_READ_TOKEN")
         ?: error("TMDB_READ_TOKEN must be set"),
     private val repository: Repository
