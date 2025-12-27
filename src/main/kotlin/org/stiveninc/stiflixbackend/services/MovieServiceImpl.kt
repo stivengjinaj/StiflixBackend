@@ -19,14 +19,17 @@ import org.springframework.cache.annotation.Cacheable
 import org.stiveninc.stiflixbackend.dtos.TmdbGenresResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbVideosResponse
+import org.stiveninc.stiflixbackend.entities.CommunicationPhrase
 import org.stiveninc.stiflixbackend.exceptions.PopularMoviesException
+import org.stiveninc.stiflixbackend.repositories.Repository
 
 @Service
 class MovieServiceImpl(
     private val tmdbApiKey: String = System.getenv("TMDB_API_KEY")
         ?: error("TMDB_API_KEY must be set"),
     private val tmdbReadToken: String = System.getenv("TMDB_READ_TOKEN")
-        ?: error("TMDB_READ_TOKEN must be set")
+        ?: error("TMDB_READ_TOKEN must be set"),
+    private val repository: Repository
 ): MovieService {
 
     private val client = HttpClient(OkHttp) {
@@ -318,5 +321,13 @@ class MovieServiceImpl(
 
             body
         }
+    }
+
+    override fun getStiflixChillCommunication(): List<CommunicationPhrase> {
+        return repository.getCommunicationPhrases()
+    }
+
+    override fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
+        return repository.saveCommunicationPhrase(communicationPhrase)
     }
 }

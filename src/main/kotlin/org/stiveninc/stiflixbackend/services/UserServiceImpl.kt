@@ -8,22 +8,22 @@ import org.stiveninc.stiflixbackend.dtos.UserMoviesDto
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 import org.stiveninc.stiflixbackend.entities.UserDocument
 import org.stiveninc.stiflixbackend.enums.UserRole
-import org.stiveninc.stiflixbackend.repositories.UserRepository
+import org.stiveninc.stiflixbackend.repositories.Repository
 
 @Service
 class UserServiceImpl(
-    private val userRepository: UserRepository
+    private val repository: Repository
 ): UserService {
     override fun getUserById(userId: String) : UserDto {
-        return userRepository.findById(userId)
+        return repository.findById(userId)
     }
 
     override fun getUserByEmail(email: String): UserDto {
-        return userRepository.findByEmail(email)
+        return repository.findByEmail(email)
     }
 
     override fun updateUserVerification(userId: String) {
-        return userRepository.updateUserVerification(userId)
+        return repository.updateUserVerification(userId)
     }
 
     override fun save(id: String, user: UserDocument) {
@@ -33,49 +33,49 @@ class UserServiceImpl(
             avatar = user.avatar?.trim()
         )
         setUserRole(id, UserRole.VIEWER)
-        userRepository.save(id, cleanUser)
+        repository.save(id, cleanUser)
     }
     override fun getContinueWatching(userId: String): List<MovieDto> {
-        return userRepository.getContinueWatching(userId)
+        return repository.getContinueWatching(userId)
     }
 
     override fun saveContinueWatching(userId: String, movie: MovieDocument) {
-        userRepository.saveContinueWatching(userId, movie)
+        repository.saveContinueWatching(userId, movie)
     }
 
     override fun saveToWatchList(userId: String, movie: MovieDocument) {
-        userRepository.saveWatchList(userId, movie)
+        repository.saveWatchList(userId, movie)
     }
 
     override fun saveToWatchLater(userId: String, movie: MovieDocument) {
-        userRepository.saveWatchLater(userId, movie)
+        repository.saveWatchLater(userId, movie)
     }
 
     override fun saveToFavourites(userId: String, movies: MovieDocument) {
-        userRepository.saveFavourites(userId, movies)
+        repository.saveFavourites(userId, movies)
     }
 
     override fun removeFromFavourites(userId: String, movieId: String) {
-        userRepository.removeFavourites(userId, movieId)
+        repository.removeFavourites(userId, movieId)
     }
 
     override fun removeFromWatchList(userId: String, movieId: String) {
-        userRepository.removeWatchList(userId, movieId)
+        repository.removeWatchList(userId, movieId)
     }
 
     override fun removeFromWatchLater(userId: String, movieId: String) {
-        userRepository.removeWatchLater(userId, movieId)
+        repository.removeWatchLater(userId, movieId)
     }
 
     override fun removeFromContinueWatching(userId: String, movieId: String) {
-        userRepository.removeContinueWatching(userId, movieId)
+        repository.removeContinueWatching(userId, movieId)
     }
 
     override fun getUserMovies(userId: String): UserMoviesDto {
-        val favourites = userRepository.getFavourites(userId)
-        val watchList = userRepository.getWatchList(userId)
-        val watchLater = userRepository.getWatchLater(userId)
-        val continueWatching = userRepository.getContinueWatching(userId)
+        val favourites = repository.getFavourites(userId)
+        val watchList = repository.getWatchList(userId)
+        val watchLater = repository.getWatchLater(userId)
+        val continueWatching = repository.getContinueWatching(userId)
 
         return UserMoviesDto (
             favourites = favourites,

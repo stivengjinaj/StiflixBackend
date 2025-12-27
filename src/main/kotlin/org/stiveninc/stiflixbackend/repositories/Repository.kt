@@ -6,15 +6,18 @@ import org.springframework.stereotype.Repository
 import org.stiveninc.stiflixbackend.dtos.MovieDto
 import org.stiveninc.stiflixbackend.dtos.UserDto
 import org.stiveninc.stiflixbackend.dtos.toDto
+import org.stiveninc.stiflixbackend.entities.CommunicationPhrase
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 import org.stiveninc.stiflixbackend.entities.UserDocument
 import org.stiveninc.stiflixbackend.exceptions.UserNotFoundException
 
 @Repository
-class UserRepository(
+class Repository(
     firestore: Firestore
 ) {
     private val userCollection = firestore.collection("users")
+    private val communicationCollection = firestore.collection("communication")
+    private val batch = firestore.batch()
     fun findById(id: String): UserDto {
         val documentSnapshot = userCollection.document(id).get().get()
         return documentSnapshot.toObject(UserDocument::class.java)?.toDto(id)
@@ -173,5 +176,21 @@ class UserRepository(
             .collection("watchList")
             .document(movieId)
             .delete()
+    }
+
+    fun getCommunicationPhrases(): List<CommunicationPhrase> {
+        val communicationSnapshot = communicationCollection.get().get()
+
+        return communicationSnapshot.documents.map {
+            it.toObject(CommunicationPhrase::class.java)
+        }
+    }
+
+
+    fun saveCommunicationPhrase(communicationPhrase: CommunicationPhrase): Boolean {
+        communicationCollection
+            .document()
+            .set(communicationPhrase)
+        return true
     }
 }

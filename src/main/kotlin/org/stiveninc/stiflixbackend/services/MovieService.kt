@@ -2,6 +2,7 @@ package org.stiveninc.stiflixbackend.services
 
 import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
 import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
+import org.stiveninc.stiflixbackend.entities.CommunicationPhrase
 
 interface MovieService {
     fun getPopularMovies(): List<TmdbMovieDto>
@@ -19,4 +20,6 @@ interface MovieService {
     fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String
     fun getLogos(mediaType: String, mediaId: Int): String
     fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
+    fun getStiflixChillCommunication(): List<CommunicationPhrase>
+    fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
 }
