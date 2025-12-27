@@ -1,7 +1,9 @@
 package org.stiveninc.stiflixbackend.dtos
 
+import kotlinx.serialization.Serializable
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 
+@Serializable
 data class MovieDto(
     val userId: String,
     val mediaType: String?,
@@ -15,7 +17,7 @@ fun MovieDocument.toDto(userId: String) = MovieDto(
     userId = userId,
     mediaType = mediaType,
     movieId = movieId,
-    date = date,
+    date = date?.toDate().toString(),
     episode = episode,
     season = season
 )

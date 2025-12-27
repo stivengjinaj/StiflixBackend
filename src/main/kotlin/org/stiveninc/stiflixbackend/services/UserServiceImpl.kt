@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.stiveninc.stiflixbackend.config.setUserRole
 import org.stiveninc.stiflixbackend.dtos.MovieDto
 import org.stiveninc.stiflixbackend.dtos.UserDto
+import org.stiveninc.stiflixbackend.dtos.UserMoviesDto
 import org.stiveninc.stiflixbackend.entities.MovieDocument
 import org.stiveninc.stiflixbackend.entities.UserDocument
 import org.stiveninc.stiflixbackend.enums.UserRole
@@ -38,26 +39,47 @@ class UserServiceImpl(
         return userRepository.getContinueWatching(userId)
     }
 
-    override fun getWatched(userId: String): List<MovieDto> {
-        return userRepository.getWatched(userId)
-    }
-
-    override fun getToWatch(userId: String): List<MovieDto> {
-        return userRepository.getToWatch(userId)
-    }
-
-    override fun saveContinueWatching(
-        userId: String,
-        movie: MovieDocument
-    ) {
+    override fun saveContinueWatching(userId: String, movie: MovieDocument) {
         userRepository.saveContinueWatching(userId, movie)
     }
 
-    override fun saveWatched(userId: String, movie: MovieDocument) {
-        userRepository.saveWatched(userId, movie)
+    override fun saveToWatchList(userId: String, movie: MovieDocument) {
+        userRepository.saveWatchList(userId, movie)
     }
 
-    override fun saveToWatch(userId: String, movie: MovieDocument) {
-        userRepository.saveToWatch(userId, movie)
+    override fun saveToWatchLater(userId: String, movie: MovieDocument) {
+        userRepository.saveWatchLater(userId, movie)
+    }
+
+    override fun saveToFavourites(userId: String, movies: MovieDocument) {
+        userRepository.saveFavourites(userId, movies)
+    }
+
+    override fun removeFromFavourites(userId: String, movieId: String) {
+        userRepository.removeFavourites(userId, movieId)
+    }
+
+    override fun removeFromWatchList(userId: String, movieId: String) {
+        userRepository.removeWatchList(userId, movieId)
+    }
+
+    override fun removeFromWatchLater(userId: String, movieId: String) {
+        userRepository.removeWatchLater(userId, movieId)
+    }
+
+    override fun removeFromContinueWatching(userId: String, movieId: String) {
+        userRepository.removeContinueWatching(userId, movieId)
+    }
+
+    override fun getUserMovies(userId: String): UserMoviesDto {
+        val favourites = userRepository.getFavourites(userId)
+        val watchList = userRepository.getWatchList(userId)
+        val watchLater = userRepository.getWatchLater(userId)
+
+        return UserMoviesDto (
+            favourites = favourites,
+            watchList = watchList,
+            watchLater = watchLater
+        )
     }
 }

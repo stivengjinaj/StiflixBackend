@@ -50,53 +50,108 @@ class UserRepository(
             .get()
             .get()
         return continueWatchingSnapshot.documents
-            .map { it -> it.toObject(MovieDocument::class.java) }
-            .map { it -> it.toDto(userId) }
+            .map { it.toObject(MovieDocument::class.java) }
+            .map { it.toDto(userId) }
     }
 
-    fun getWatched(userId: String): List<MovieDto> {
+    fun getFavourites(userId: String): List<MovieDto> {
+        val favouriteWatchingSnapshot = userCollection
+            .document(userId)
+            .collection("favourites")
+            .get()
+            .get()
+        return favouriteWatchingSnapshot.documents
+            .map { it.toObject(MovieDocument::class.java) }
+            .map { it.toDto(userId) }
+    }
+
+    fun getWatchList(userId: String): List<MovieDto> {
         val watchedSnapshot = userCollection
             .document(userId)
             .collection("watched")
             .get()
             .get()
         return watchedSnapshot.documents
-            .map { it -> it.toObject(MovieDocument::class.java) }
-            .map { it -> it.toDto(userId) }
+            .map { it.toObject(MovieDocument::class.java) }
+            .map { it.toDto(userId) }
     }
 
-    fun getToWatch(userId: String): List<MovieDto> {
+    fun getWatchLater(userId: String): List<MovieDto> {
         val toWatchSnapshot = userCollection
             .document(userId)
             .collection("toWatch")
             .get()
             .get()
         return toWatchSnapshot.documents
-            .map { it -> it.toObject(MovieDocument::class.java) }
-            .map { it -> it.toDto(userId) }
+            .map { it.toObject(MovieDocument::class.java) }
+            .map { it.toDto(userId) }
     }
 
     fun saveContinueWatching(userId: String, movieDocument: MovieDocument) {
+        movieDocument.movieId?.let {
+            userCollection
+                .document(userId)
+                .collection("continueWatching")
+                .document(it)
+        }?.set(movieDocument)
+    }
+
+    fun saveWatchList(userId: String, movieDocument: MovieDocument) {
+        movieDocument.movieId?.let {
+            userCollection
+                .document(userId)
+                .collection("watchList")
+                .document(it)
+        }?.set(movieDocument)
+    }
+
+    fun saveWatchLater(userId: String, movieDocument: MovieDocument) {
+        movieDocument.movieId?.let {
+            userCollection
+                .document(userId)
+                .collection("watchLater")
+                .document(it)
+        }?.set(movieDocument)
+    }
+
+    fun saveFavourites(userId: String, movieDocument: MovieDocument) {
+        movieDocument.movieId?.let {
+            userCollection
+                .document(userId)
+                .collection("favourites")
+                .document(it)
+        }?.set(movieDocument)
+    }
+
+    fun removeContinueWatching(userId: String, movieId: String) {
         userCollection
             .document(userId)
             .collection("continueWatching")
-            .document()
-            .set(movieDocument)
+            .document(movieId)
+            .delete()
     }
 
-    fun saveWatched(userId: String, movieDocument: MovieDocument) {
+    fun removeFavourites(userId: String, movieId: String) {
         userCollection
             .document(userId)
-            .collection("watched")
-            .document()
-            .set(movieDocument)
+            .collection("favourites")
+            .document(movieId)
+            .delete()
     }
 
-    fun saveToWatch(userId: String, movieDocument: MovieDocument) {
+    fun removeWatchLater(userId: String, movieId: String) {
         userCollection
             .document(userId)
-            .collection("toWatch")
-            .document()
-            .set(movieDocument)
+            .collection("watchLater")
+            .document(movieId)
+            .delete()
+    }
+
+    fun removeWatchList(userId: String, movieId: String) {
+        userCollection
+            .document(userId)
+            .collection("watchList")
+            .document(movieId)
+            .delete()
     }
 }

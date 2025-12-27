@@ -113,7 +113,7 @@ class MoviesController(
     @PreAuthorize("hasRole('OWNER') or hasRole('EDITOR')")
     @GetMapping("/api/v2/stiflixchill/home/{page}")
     suspend fun getStiflixChillHome(
-        @PathVariable page: Int = 1
+        @PathVariable page: Int
     ): TmdbPagedResponse<TmdbMovieDto> {
         return service.getStiflixChillHome(page)
     }
