@@ -22,4 +22,6 @@ interface MovieService {
     fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
     fun getStiflixChillCommunication(): List<CommunicationPhrase>
     fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
+    fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
+    fun deleteStiflixChillCommunication(id: String): Boolean
 }

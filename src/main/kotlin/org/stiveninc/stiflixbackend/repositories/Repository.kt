@@ -31,12 +31,37 @@ class Repository(
         return documentSnapshot.toObject(UserDocument::class.java).toDto(documentSnapshot.id)
     }
 
+    fun getAllUsers(): List<UserDto> {
+        val users = userCollection.get().get()
+        return users.documents.map {
+            val usrObj = it.toObject(UserDocument::class.java)
+            UserDto(
+                id=it.id,
+                email = usrObj.email,
+                fullName = usrObj.fullName,
+                avatar = usrObj.avatar,
+                verified = usrObj.verified,
+            )
+        }
+    }
+
+    fun updateUserData(user: UserDto) {
+        val data = mapOf(
+            "fullName" to user.fullName,
+            "avatar" to user.avatar,
+            "verified" to user.verified
+        )
+        userCollection
+            .document(user.id)
+            .set(data)
+    }
+
     fun updateUserVerification(userId: String) {
         val userRef = userCollection.document(userId)
         userRef.update("verified", true)
     }
 
-    fun save(id: String, userDocument: UserDocument) {
+    fun saveUser(id: String, userDocument: UserDocument) {
         val cleanUser = userDocument.copy(
             fullName = userDocument.fullName,
             email = userDocument.email,
@@ -44,6 +69,11 @@ class Repository(
             verified = false
         )
         userCollection.document(id).set(cleanUser)
+    }
+
+    fun deleteUser(id: String): Boolean {
+        val user = userCollection.document(id).delete()
+        return user.isDone
     }
 
     fun getContinueWatching(userId: String): List<MovieDto> {
@@ -179,18 +209,50 @@ class Repository(
     }
 
     fun getCommunicationPhrases(): List<CommunicationPhrase> {
-        val communicationSnapshot = communicationCollection.get().get()
+        val snapshot = communicationCollection.get().get()
 
-        return communicationSnapshot.documents.map {
-            it.toObject(CommunicationPhrase::class.java)
+        return snapshot.documents.mapNotNull { doc ->
+            doc.toObject(CommunicationPhrase::class.java)
+                .copy(id = doc.id)
+        }
+    }
+
+    fun saveCommunicationPhrase(communicationPhrase: CommunicationPhrase): Boolean {
+        if (communicationPhrase.content == "") return false
+        val data = mapOf(
+            "type" to communicationPhrase.type,
+            "content" to communicationPhrase.content
+        )
+        communicationCollection
+            .document()
+            .set(data)
+        return true
+    }
+
+    fun updateCommunicationPhrase(communicationPhrase: CommunicationPhrase): Boolean {
+        val id = communicationPhrase.id ?: return false
+
+        val data = mapOf(
+            "type" to communicationPhrase.type,
+            "content" to communicationPhrase.content
+        )
+
+        return try {
+            communicationCollection
+                .document(id)
+                .set(data)
+                .get()
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 
 
-    fun saveCommunicationPhrase(communicationPhrase: CommunicationPhrase): Boolean {
+    fun deleteCommunicationPhrase(id: String): Boolean{
         communicationCollection
-            .document()
-            .set(communicationPhrase)
+            .document(id)
+            .delete()
         return true
     }
 }

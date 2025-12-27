@@ -9,8 +9,11 @@ import org.stiveninc.stiflixbackend.entities.UserDocument
 interface UserService {
     fun getUserById(userId: String): UserDto
     fun getUserByEmail(email: String): UserDto
+    fun getAllUsers(): List<UserDto>
+    fun updateUserData(user: UserDto): Boolean
     fun updateUserVerification(userId: String)
-    fun save(id: String, user: UserDocument)
+    fun createUser(id: String, user: UserDocument)
+    fun deleteUser(id: String): Boolean
     fun getContinueWatching(userId: String): List<MovieDto>
     fun saveContinueWatching(userId: String, movie: MovieDocument)
     fun saveToWatchList(userId: String, movie: MovieDocument)

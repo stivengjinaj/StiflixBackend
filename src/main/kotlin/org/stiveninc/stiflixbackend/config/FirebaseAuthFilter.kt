@@ -59,3 +59,12 @@ fun setUserRole(uid: String, role: UserRole) {
         mapOf("role" to role.name)
     )
 }
+
+fun deleteUserAuth(uid: String): Boolean {
+    return try {
+        FirebaseAuth.getInstance().deleteUser(uid)
+        true
+    } catch (e: Exception) {
+        false
+    }
+}

@@ -4,9 +4,11 @@ import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
@@ -20,56 +22,56 @@ class MoviesController(
 ) {
 
     @GetMapping("/api/v2/movies/popularMovies")
-    suspend fun getPopularMovies(): List<TmdbMovieDto> {
+    fun getPopularMovies(): List<TmdbMovieDto> {
         return service.getPopularMovies()
     }
 
     @GetMapping("/api/v2/movies/popularTvShows")
-    suspend fun getPopularTvShows(): List<TmdbMovieDto> {
+    fun getPopularTvShows(): List<TmdbMovieDto> {
         return service.getPopularTvShows()
     }
 
     @GetMapping("/api/v2/movies/topRatedMovies")
-    suspend fun getTopRatedMovies(): List<TmdbMovieDto> {
+    fun getTopRatedMovies(): List<TmdbMovieDto> {
         return service.getTopRatedMovies()
     }
 
     @GetMapping("/api/v2/movies/topRatedTvShows")
-    suspend fun getTopRatedTvShows(): List<TmdbMovieDto> {
+    fun getTopRatedTvShows(): List<TmdbMovieDto> {
         return service.getTopRatedTvShows()
     }
 
     @GetMapping("/api/v2/movies/trendingMovies")
-    suspend fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> {
+    fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> {
         return service.getTrendingMovies()
     }
 
     @GetMapping("/api/v2/movies/discoverMovies")
-    suspend fun discoverMovies(): List<TmdbMovieDto> {
+    fun discoverMovies(): List<TmdbMovieDto> {
         return service.discoverMovies()
     }
 
     @GetMapping("/api/v2/movies/discoverTvShows")
-    suspend fun discoverTvShows(): List<TmdbMovieDto> {
+    fun discoverTvShows(): List<TmdbMovieDto> {
         return service.discoverTvShows()
     }
 
     @GetMapping("/api/v2/movies/tvShowDetails/{tvShowId}")
-    suspend fun getTvShowDetails(
+    fun getTvShowDetails(
         @PathVariable tvShowId: Int
     ): TmdbMovieDto {
         return service.getTvShowDetails(tvShowId)
     }
 
     @GetMapping("/api/v2/movies/search/{query}")
-    suspend fun search(
+    fun search(
         @PathVariable query: String
     ): TmdbPagedResponse<TmdbMovieDto> {
         return service.search(query)
     }
 
     @GetMapping("/api/v2/movies/trailer/{mediaType}/{mediaId}")
-    suspend fun getTrailerKey(
+    fun getTrailerKey(
         @PathVariable mediaType: String,
         @PathVariable mediaId: Int
     ): List<String> {
@@ -77,7 +79,7 @@ class MoviesController(
     }
 
     @GetMapping("/api/v2/movies/genres/{mediaId}/{mediaType}")
-    suspend fun mediaGenres(
+    fun mediaGenres(
         @PathVariable mediaId: Int,
         @PathVariable mediaType: String
     ): Map<Int, String> {
@@ -85,7 +87,7 @@ class MoviesController(
     }
 
     @GetMapping("/api/v2/movies/details/{mediaType}/{mediaId}")
-    suspend fun mediaDetails(
+    fun mediaDetails(
         @PathVariable mediaType: String,
         @PathVariable mediaId: Int
     ): ResponseEntity<String> =
@@ -95,7 +97,7 @@ class MoviesController(
             .body(service.mediaDetails(mediaType, mediaId))
 
     @GetMapping("/api/v2/movies/tv/{tvShowId}/seasons/{seasonNumber}")
-    suspend fun getTvShowsSeasons(
+    fun getTvShowsSeasons(
         @PathVariable tvShowId: Int,
         @PathVariable seasonNumber: Int
     ): ResponseEntity<String> =
@@ -105,7 +107,7 @@ class MoviesController(
             .body(service.getTvShowsSeasons(tvShowId, seasonNumber))
 
     @GetMapping("/api/v2/movies/logos/{mediaType}/{mediaId}")
-    suspend fun getLogos(
+    fun getLogos(
         @PathVariable mediaType: String,
         @PathVariable mediaId: Int
     ): ResponseEntity<String> =
@@ -116,7 +118,7 @@ class MoviesController(
 
     @PreAuthorize("hasRole('OWNER') or hasRole('EDITOR')")
     @GetMapping("/api/v2/stiflixchill/home/{page}")
-    suspend fun getStiflixChillHome(
+    fun getStiflixChillHome(
         @PathVariable page: Int
     ): TmdbPagedResponse<TmdbMovieDto> {
         return service.getStiflixChillHome(page)
@@ -124,16 +126,34 @@ class MoviesController(
 
     @PreAuthorize("hasRole('OWNER') or hasRole('EDITOR')")
     @GetMapping("/api/v2/stiflixchill/communication")
-    suspend fun getStiflixChillCommunication(): List<CommunicationPhrase> {
+    fun getStiflixChillCommunication(): List<CommunicationPhrase> {
         return service.getStiflixChillCommunication()
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @PostMapping("/api/v2/stiflixchill/communication")
-    suspend fun saveStiflixChillCommunication(
+    @PutMapping("/api/v2/admin/stiflixchill/communication")
+    fun updateStiflixChillCommunication(
+        @Valid @RequestBody communicationPhrase: CommunicationPhrase
+    ): ResponseEntity<Boolean> {
+        val communication = service.updateStiflixChillCommunication(communicationPhrase)
+        return ResponseEntity.ok(communication)
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PostMapping("/api/v2/admin/stiflixchill/communication")
+    fun saveStiflixChillCommunication(
         @Valid @RequestBody communicationPhrase: CommunicationPhrase
     ): ResponseEntity<Boolean> {
         val communication = service.saveStiflixChillCommunication(communicationPhrase)
         return ResponseEntity.ok(communication)
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @DeleteMapping("/api/v2/admin/stiflixchill/communication/{id}")
+    fun deleteStiflixChill(
+        @PathVariable id: String
+    ): ResponseEntity<Boolean> {
+        service.deleteStiflixChillCommunication(id)
+        return ResponseEntity.ok(true)
     }
 }

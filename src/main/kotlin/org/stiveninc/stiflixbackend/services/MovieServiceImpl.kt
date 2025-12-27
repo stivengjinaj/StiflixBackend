@@ -330,4 +330,12 @@ class MovieServiceImpl(
     override fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
         return repository.saveCommunicationPhrase(communicationPhrase)
     }
+
+    override fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
+        return repository.updateCommunicationPhrase(communicationPhrase)
+    }
+
+    override fun deleteStiflixChillCommunication(id: String): Boolean {
+        return repository.deleteCommunicationPhrase(id)
+    }
 }

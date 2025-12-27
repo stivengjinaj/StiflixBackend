@@ -1,6 +1,7 @@
 package org.stiveninc.stiflixbackend.services
 
 import org.springframework.stereotype.Service
+import org.stiveninc.stiflixbackend.config.deleteUserAuth
 import org.stiveninc.stiflixbackend.config.setUserRole
 import org.stiveninc.stiflixbackend.dtos.MovieDto
 import org.stiveninc.stiflixbackend.dtos.UserDto
@@ -22,19 +23,37 @@ class UserServiceImpl(
         return repository.findByEmail(email)
     }
 
+    override fun getAllUsers(): List<UserDto> {
+        return repository.getAllUsers()
+    }
+
+    override fun updateUserData(user: UserDto): Boolean {
+        repository.updateUserData(user)
+        return true
+    }
+
+
     override fun updateUserVerification(userId: String) {
         return repository.updateUserVerification(userId)
     }
 
-    override fun save(id: String, user: UserDocument) {
+    override fun createUser(id: String, user: UserDocument) {
         val cleanUser = user.copy(
             fullName = user.fullName?.trim(),
             email = user.email?.trim(),
             avatar = user.avatar?.trim()
         )
         setUserRole(id, UserRole.VIEWER)
-        repository.save(id, cleanUser)
+        repository.saveUser(id, cleanUser)
     }
+
+    override fun deleteUser(id: String): Boolean {
+        val authDeleted = deleteUserAuth(id)
+        if (!authDeleted) return false
+        val userDeleted = repository.deleteUser(id)
+        return userDeleted
+    }
+
     override fun getContinueWatching(userId: String): List<MovieDto> {
         return repository.getContinueWatching(userId)
     }

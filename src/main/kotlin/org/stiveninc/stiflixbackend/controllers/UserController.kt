@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.stiveninc.stiflixbackend.config.setUserRole
@@ -28,12 +27,37 @@ import org.stiveninc.stiflixbackend.services.UserService
 class UserController(private val userService: UserService) {
 
     @PreAuthorize("hasRole('OWNER')")
-    @PutMapping("/api/v2/admin/{userId}/role")
+    @PutMapping("/api/v2/admin/users/{userId}/role/{role}")
     fun setRole(
         @PathVariable userId: String,
-        @RequestParam role: UserRole
-    ) {
+        @PathVariable role: UserRole
+    ): ResponseEntity<Boolean> {
         setUserRole(userId, role)
+        return ResponseEntity.ok(true)
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/api/v2/admin/users")
+    fun getAllUsers(): List<UserDto>{
+        return userService.getAllUsers()
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PutMapping("/api/v2/admin/users")
+    fun updateUserData(
+        @RequestBody userDto: UserDto,
+    ): ResponseEntity<Boolean> {
+        userService.updateUserData(userDto)
+        return ResponseEntity.ok(true)
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @DeleteMapping("/api/v2/admin/users/{userId}")
+    fun deleteUser(
+        @PathVariable userId: String,
+    ): ResponseEntity<Boolean>{
+        val deleted = userService.deleteUser(userId)
+        return ResponseEntity.ok(deleted)
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -45,20 +69,20 @@ class UserController(private val userService: UserService) {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/api/v2/users/")
+    @PatchMapping("/api/v2/users")
     fun updateUserVerification(
         @AuthenticationPrincipal userId: String,
     ){
         return userService.updateUserVerification(userId)
     }
 
-    @PostMapping("/api/v2/users/")
-    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/api/v2/users")
     fun saveUser(
         @AuthenticationPrincipal userId: String,
         @Valid @RequestBody user: UserDocument
-    ) {
-        return userService.save(userId, user)
+    ): ResponseEntity<Boolean> {
+        userService.createUser(userId, user)
+        return ResponseEntity.status(HttpStatus.CREATED).body(true)
     }
 
     @PreAuthorize("isAuthenticated()")
