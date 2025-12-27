@@ -92,8 +92,8 @@ class UserRepository(
             "movieId" to movieDocument.movieId,
             "mediaType" to movieDocument.mediaType,
             "posterPath" to movieDocument.posterPath,
-            "season" to movieDocument.season?.toInt(),
-            "episode" to movieDocument.episode?.toInt(),
+            "season" to movieDocument.season,
+            "episode" to movieDocument.episode,
             "date" to FieldValue.serverTimestamp()
         )
         movieDocument.movieId?.let {
