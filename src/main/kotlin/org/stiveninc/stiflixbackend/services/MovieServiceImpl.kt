@@ -13,7 +13,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.springframework.cache.annotation.Cacheable
 import org.stiveninc.stiflixbackend.dtos.TmdbGenresResponse
@@ -28,7 +27,7 @@ class MovieServiceImpl(
     private val tmdbReadToken: String = System.getenv("TMDB_READ_TOKEN")
         ?: error("TMDB_READ_TOKEN must be set"),
     private val repository: Repository
-): MovieService {
+) : MovieService {
 
     private val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
@@ -40,7 +39,7 @@ class MovieServiceImpl(
     }
 
     @Cacheable(value = ["tmdb_movies"], key = "'popular_movies'")
-    override fun getPopularMovies(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun getPopularMovies(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/discover/movie") {
             parameter("include_adult", false)
             parameter("include_video", false)
@@ -53,11 +52,11 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
     @Cacheable(value = ["tmdb_tvshows"], key = "'popular_tvshows'")
-    override fun getPopularTvShows(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun getPopularTvShows(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/discover/tv") {
             parameter("include_adult", false)
             parameter("include_video", false)
@@ -73,11 +72,11 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
     @Cacheable(value = ["tmdb_movies"], key = "'top_rated_movies'")
-    override fun getTopRatedMovies(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun getTopRatedMovies(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/movie/top_rated") {
             parameter("include_adult", false)
             parameter("include_null_first_air_dates", false)
@@ -93,11 +92,11 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
     @Cacheable(value = ["tmdb_tvshows"], key = "'top_rated_tvshows'")
-    override fun getTopRatedTvShows(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun getTopRatedTvShows(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/tv/top_rated") {
             parameter("include_adult", false)
             parameter("include_null_first_air_dates", false)
@@ -113,11 +112,11 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
     @Cacheable(value = ["tmdb_movies"], key = "'trending_movies'")
-    override fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> = runBlocking {
+    override suspend fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/trending/all/day") {
             parameter("language", "en-US")
             header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
@@ -128,11 +127,10 @@ class MovieServiceImpl(
             throw PopularMoviesException("Failed: ${response.status}")
         }
 
-        val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body
+        return response.body()
     }
 
-    override fun getTvShowDetails(tvShowId: Int): TmdbMovieDto = runBlocking {
+    override suspend fun getTvShowDetails(tvShowId: Int): TmdbMovieDto {
         val response = client.get("https://api.themoviedb.org/3/tv/$tvShowId") {
             parameter("language", "en-US")
             header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
@@ -143,12 +141,11 @@ class MovieServiceImpl(
             throw PopularMoviesException("Failed: ${response.status}")
         }
 
-        val body: TmdbMovieDto = response.body()
-        body
+        return response.body()
     }
 
     @Cacheable(value = ["tmdb_movies"], key = "'discover_movies'")
-    override fun discoverMovies(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun discoverMovies(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/discover/movie") {
             parameter("include_adult", false)
             parameter("include_video", false)
@@ -164,11 +161,11 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
     @Cacheable(value = ["tmdb_tvshows"], key = "'discover_tvshows'")
-    override fun discoverTvShows(): List<TmdbMovieDto> = runBlocking {
+    override suspend fun discoverTvShows(): List<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/discover/tv") {
             parameter("include_adult", false)
             parameter("include_video", false)
@@ -185,10 +182,10 @@ class MovieServiceImpl(
         }
 
         val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body.results
+        return body.results
     }
 
-    override fun search(query: String): TmdbPagedResponse<TmdbMovieDto> = runBlocking {
+    override suspend fun search(query: String): TmdbPagedResponse<TmdbMovieDto> {
         val response = client.get("https://api.themoviedb.org/3/search/multi") {
             parameter("query", query)
             parameter("include_adult", false)
@@ -202,14 +199,13 @@ class MovieServiceImpl(
             throw PopularMoviesException("Failed: ${response.status}")
         }
 
-        val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-        body
+        return response.body()
     }
 
-    override fun getTrailerKey(
+    override suspend fun getTrailerKey(
         mediaType: String,
         mediaId: Int
-    ): List<String> = runBlocking {
+    ): List<String> {
         val response = client.get(
             "https://api.themoviedb.org/3/$mediaType/$mediaId/videos"
         ) {
@@ -223,12 +219,12 @@ class MovieServiceImpl(
         }
 
         val body: TmdbVideosResponse = response.body()
-        body.results
+        return body.results
             .filter { it.site == "YouTube" && it.type == "Trailer" }
             .map { it.key }
     }
 
-    override fun mediaGenres(mediaId: Int, mediaType: String): Map<Int, String> = runBlocking {
+    override suspend fun mediaGenres(mediaId: Int, mediaType: String): Map<Int, String> {
         val response = client.get(
             "https://api.themoviedb.org/3/$mediaType/$mediaId"
         ) {
@@ -242,13 +238,13 @@ class MovieServiceImpl(
         }
 
         val body: TmdbGenresResponse = response.body()
-        body.genres.associate { it.id to it.name }
+        return body.genres.associate { it.id to it.name }
     }
 
-    override fun mediaDetails(
+    override suspend fun mediaDetails(
         mediaType: String,
         mediaId: Int
-    ): String = runBlocking {
+    ): String {
         val response = client.get(
             "https://api.themoviedb.org/3/$mediaType/$mediaId"
         ) {
@@ -261,10 +257,10 @@ class MovieServiceImpl(
             throw PopularMoviesException("TMDB error: ${response.status}")
         }
 
-        response.bodyAsText()
+        return response.bodyAsText()
     }
 
-    override fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String = runBlocking {
+    override suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String {
         val response = client.get("https://api.themoviedb.org/3/tv/$tvShowId/season/$seasonNumber") {
             parameter("language", "en-US")
             header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
@@ -275,13 +271,13 @@ class MovieServiceImpl(
             throw PopularMoviesException("Failed: ${response.status}")
         }
 
-        response.bodyAsText()
+        return response.bodyAsText()
     }
 
-    override fun getLogos(
+    override suspend fun getLogos(
         mediaType: String,
         mediaId: Int
-    ): String = runBlocking {
+    ): String {
         val response = client.get(
             "https://api.themoviedb.org/3/$mediaType/$mediaId"
         ) {
@@ -296,44 +292,40 @@ class MovieServiceImpl(
             throw PopularMoviesException("TMDB error: ${response.status}")
         }
 
-        response.bodyAsText()
+        return response.bodyAsText()
     }
 
-    override fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto> {
-        return runBlocking {
-            val response = client.get("https://api.themoviedb.org/3/discover/movie") {
-                parameter("page", page)
-                parameter("include_video", false)
-                parameter("language" , "en-US")
-                parameter("sort_by", "popularity.desc")
-                parameter("with_genres", "35|10749")
-                header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
-                header(HttpHeaders.Accept, "application/json")
-            }
-
-            if (!response.status.isSuccess()) {
-                throw PopularMoviesException("TMDB error: ${response.status}")
-            }
-
-            val body: TmdbPagedResponse<TmdbMovieDto> = response.body()
-
-            body
+    override suspend fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto> {
+        val response = client.get("https://api.themoviedb.org/3/discover/movie") {
+            parameter("page", page)
+            parameter("include_video", false)
+            parameter("language", "en-US")
+            parameter("sort_by", "popularity.desc")
+            parameter("with_genres", "35|10749")
+            header(HttpHeaders.Authorization, "Bearer $tmdbReadToken")
+            header(HttpHeaders.Accept, "application/json")
         }
+
+        if (!response.status.isSuccess()) {
+            throw PopularMoviesException("TMDB error: ${response.status}")
+        }
+
+        return response.body()
     }
 
-    override fun getStiflixChillCommunication(): List<CommunicationPhrase> {
+    override suspend fun getStiflixChillCommunication(): List<CommunicationPhrase> {
         return repository.getCommunicationPhrases()
     }
 
-    override fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
+    override suspend fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
         return repository.saveCommunicationPhrase(communicationPhrase)
     }
 
-    override fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
+    override suspend fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean {
         return repository.updateCommunicationPhrase(communicationPhrase)
     }
 
-    override fun deleteStiflixChillCommunication(id: String): Boolean {
+    override suspend fun deleteStiflixChillCommunication(id: String): Boolean {
         return repository.deleteCommunicationPhrase(id)
     }
 }

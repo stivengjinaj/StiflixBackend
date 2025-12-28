@@ -5,23 +5,23 @@ import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
 import org.stiveninc.stiflixbackend.entities.CommunicationPhrase
 
 interface MovieService {
-    fun getPopularMovies(): List<TmdbMovieDto>
-    fun getPopularTvShows(): List<TmdbMovieDto>
-    fun getTopRatedMovies(): List<TmdbMovieDto>
-    fun getTopRatedTvShows(): List<TmdbMovieDto>
-    fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto>
-    fun getTvShowDetails(tvShowId: Int): TmdbMovieDto
-    fun discoverMovies(): List<TmdbMovieDto>
-    fun discoverTvShows(): List<TmdbMovieDto>
-    fun search(query: String): TmdbPagedResponse<TmdbMovieDto>
-    fun getTrailerKey(mediaType: String, mediaId: Int): List<String>
-    fun mediaGenres(mediaId: Int, mediaType: String): Map<Int, String>
-    fun mediaDetails(mediaType: String, mediaId: Int): String
-    fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String
-    fun getLogos(mediaType: String, mediaId: Int): String
-    fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
-    fun getStiflixChillCommunication(): List<CommunicationPhrase>
-    fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
-    fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
-    fun deleteStiflixChillCommunication(id: String): Boolean
+    suspend fun getPopularMovies(): List<TmdbMovieDto>
+    suspend fun getPopularTvShows(): List<TmdbMovieDto>
+    suspend fun getTopRatedMovies(): List<TmdbMovieDto>
+    suspend fun getTopRatedTvShows(): List<TmdbMovieDto>
+    suspend fun getTrendingMovies(): TmdbPagedResponse<TmdbMovieDto>
+    suspend fun getTvShowDetails(tvShowId: Int): TmdbMovieDto
+    suspend fun discoverMovies(): List<TmdbMovieDto>
+    suspend fun discoverTvShows(): List<TmdbMovieDto>
+    suspend fun search(query: String): TmdbPagedResponse<TmdbMovieDto>
+    suspend fun getTrailerKey(mediaType: String, mediaId: Int): List<String>
+    suspend fun mediaGenres(mediaId: Int, mediaType: String): Map<Int, String>
+    suspend fun mediaDetails(mediaType: String, mediaId: Int): String
+    suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String
+    suspend fun getLogos(mediaType: String, mediaId: Int): String
+    suspend fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
+    suspend fun getStiflixChillCommunication(): List<CommunicationPhrase>
+    suspend fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
+    suspend fun updateStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean
+    suspend fun deleteStiflixChillCommunication(id: String): Boolean
 }
