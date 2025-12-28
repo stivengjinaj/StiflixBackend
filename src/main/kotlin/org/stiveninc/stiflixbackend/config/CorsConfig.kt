@@ -15,7 +15,7 @@ class CorsConfig {
 
         config.allowedOrigins = listOf(
             "http://localhost:5173",
-            "https://stiflix.vercel.app"
+            "https://stiflix.onrender.com"
         )
 
         config.allowedMethods = listOf(
