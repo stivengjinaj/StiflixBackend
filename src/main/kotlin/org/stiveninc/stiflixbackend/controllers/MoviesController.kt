@@ -20,6 +20,8 @@ import org.stiveninc.stiflixbackend.services.MovieService
 class MoviesController(
     private val service: MovieService,
 ) {
+    @GetMapping("/api/v2/health")
+    suspend fun getHealth(): ResponseEntity<Boolean> = ResponseEntity.ok(true)
 
     @GetMapping("/api/v2/movies/popularMovies")
     suspend fun getPopularMovies(): List<TmdbMovieDto> {
