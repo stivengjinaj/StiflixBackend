@@ -17,7 +17,6 @@ class Repository(
 ) {
     private val userCollection = firestore.collection("users")
     private val communicationCollection = firestore.collection("communication")
-    private val batch = firestore.batch()
     fun findById(id: String): UserDto {
         val documentSnapshot = userCollection.document(id).get().get()
         return documentSnapshot.toObject(UserDocument::class.java)?.toDto(id)
@@ -140,7 +139,8 @@ class Repository(
     fun saveWatchList(userId: String, movieDocument: MovieDocument) {
         val data = mapOf(
             "movieId" to movieDocument.movieId,
-            "mediaType" to movieDocument.mediaType
+            "mediaType" to movieDocument.mediaType,
+            "posterPath" to movieDocument.posterPath,
         )
         movieDocument.movieId?.let {
             userCollection
@@ -153,7 +153,8 @@ class Repository(
     fun saveWatchLater(userId: String, movieDocument: MovieDocument) {
         val data = mapOf(
             "movieId" to movieDocument.movieId,
-            "mediaType" to movieDocument.mediaType
+            "mediaType" to movieDocument.mediaType,
+            "posterPath" to movieDocument.posterPath,
         )
         movieDocument.movieId?.let {
             userCollection
@@ -166,7 +167,8 @@ class Repository(
     fun saveFavourites(userId: String, movieDocument: MovieDocument) {
         val data = mapOf(
             "movieId" to movieDocument.movieId,
-            "mediaType" to movieDocument.mediaType
+            "mediaType" to movieDocument.mediaType,
+            "posterPath" to movieDocument.posterPath,
         )
         movieDocument.movieId?.let {
             userCollection
@@ -243,7 +245,7 @@ class Repository(
                 .set(data)
                 .get()
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
