@@ -1,6 +1,7 @@
 package org.stiveninc.stiflixbackend.controllers
 
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -117,6 +118,26 @@ class MoviesController(
             .ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(service.getLogos(mediaType, mediaId))
+
+    @GetMapping("/api/v2/movies/{path}/backdrop")
+    suspend fun getBackdrop(
+        @PathVariable path: String
+    ): ResponseEntity<ByteArray> {
+        return ResponseEntity
+            .ok()
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(service.getBackdropPath(path))
+    }
+
+    @GetMapping("/api/v2/movies/{path}/poster")
+    suspend fun getPoster(
+        @PathVariable path: String
+    ): ResponseEntity<ByteArray> {
+        return ResponseEntity
+            .ok()
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(service.getBackdropPath(path))
+    }
 
     @PreAuthorize("hasRole('OWNER') or hasRole('EDITOR')")
     @GetMapping("/api/v2/stiflixchill/home/{page}")

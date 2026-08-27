@@ -19,6 +19,8 @@ interface MovieService {
     suspend fun mediaDetails(mediaType: String, mediaId: Int): String
     suspend fun getTvShowsSeasons(tvShowId: Int, seasonNumber: Int): String
     suspend fun getLogos(mediaType: String, mediaId: Int): String
+    suspend fun getBackdropPath(path: String) : ByteArray
+    suspend fun getPosterPath(path: String) : ByteArray
     suspend fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto>
     suspend fun getStiflixChillCommunication(): List<CommunicationPhrase>
     suspend fun saveStiflixChillCommunication(communicationPhrase: CommunicationPhrase): Boolean

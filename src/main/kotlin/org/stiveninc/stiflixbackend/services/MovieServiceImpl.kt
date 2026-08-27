@@ -1,21 +1,19 @@
 package org.stiveninc.stiflixbackend.services
 
-import org.springframework.stereotype.Service
-import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
 import io.ktor.client.*
-import io.ktor.client.call.body
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.parameter
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
-import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.call.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
 import org.stiveninc.stiflixbackend.dtos.TmdbGenresResponse
+import org.stiveninc.stiflixbackend.dtos.TmdbMovieDto
 import org.stiveninc.stiflixbackend.dtos.TmdbPagedResponse
 import org.stiveninc.stiflixbackend.dtos.TmdbVideosResponse
 import org.stiveninc.stiflixbackend.entities.CommunicationPhrase
@@ -24,8 +22,8 @@ import org.stiveninc.stiflixbackend.repositories.Repository
 
 @Service
 class MovieServiceImpl(
-    private val tmdbReadToken: String = System.getenv("TMDB_READ_TOKEN")
-        ?: error("TMDB_READ_TOKEN must be set"),
+    @Value("\${TMDB_READ_TOKEN}")
+    private val tmdbReadToken: String,
     private val repository: Repository
 ) : MovieService {
 
@@ -293,6 +291,21 @@ class MovieServiceImpl(
         }
 
         return response.bodyAsText()
+    }
+
+    override suspend fun getBackdropPath(path: String): ByteArray {
+        val response = client.get(
+            "https://image.tmdb.org/t/p/original/$path"
+        )
+        return response.body<ByteArray>()
+    }
+
+    override suspend fun getPosterPath(path: String): ByteArray {
+        val response = client.get(
+            "https://image.tmdb.org/t/p/w500/$path"
+        )
+
+        return response.body<ByteArray>()
     }
 
     override suspend fun getStiflixChillHome(page: Int): TmdbPagedResponse<TmdbMovieDto> {
